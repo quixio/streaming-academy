@@ -7,7 +7,7 @@ metadata:
 # This section describes the Deployments of the data pipeline
 deployments:
   - name: Web Gateway
-    application: Web Gateway
+    application: web-gateway
     deploymentType: Service
     version: latest
     resources:
