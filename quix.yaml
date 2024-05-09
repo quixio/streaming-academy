@@ -27,6 +27,13 @@ deployments:
 
 # This section describes the Topics of the data pipeline
 topics:
+  - name: raw-data
+    persisted: false
+    configuration:
+      partitions: 2
+      replicationFactor: 2
+      retentionInMinutes: -1
+      retentionInBytes: 52428800
   - name: csv-data
     persisted: false
     configuration:
