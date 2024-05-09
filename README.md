@@ -5,6 +5,7 @@ This repo contains a code and instructions to support series of episodes of Stre
 1. Episode 1: Intro to stream processing
    - What is stream processing
    - Motivation
+   - Landscape overview
    - Kafka fundamentals
      - Topics
      - Partitions
@@ -17,6 +18,13 @@ This repo contains a code and instructions to support series of episodes of Stre
      - Output DataFrame
      - Group By (repartition)
      - Reprocessing
+   - Practice part
+     - Sign up
+     - Create a project
+     - Create an environment
+     - Setting up GitHub codespaces
+     - Creating Flask WebGateway producer
+     - Building data normalization service
 2. Episode 2: Stateful data transformations
    - Usecases
    - State fundamentals
@@ -25,7 +33,7 @@ This repo contains a code and instructions to support series of episodes of Stre
    - State recovery
    - Partition reaasigment
    - Changelog topics
-3. Episode 3: Realtime ML inteference
+3. Episode 3: Realtime ML inference
    - Architecture introduction
    - Model training
    - Model deployment
