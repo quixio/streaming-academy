@@ -24,6 +24,25 @@ deployments:
         description: This is the output topic for hello world data
         required: true
         value: raw-data
+  - name: data-normalization
+    application: data-normalization
+    deploymentType: Service
+    version: latest
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: Name of the input topic to listen to.
+        required: true
+        value: raw-data
+      - name: output
+        inputType: OutputTopic
+        description: Name of the output topic to write to.
+        required: true
+        value: table-data
 
 # This section describes the Topics of the data pipeline
 topics:
@@ -33,11 +52,4 @@ topics:
       partitions: 2
       replicationFactor: 2
       retentionInMinutes: -1
-      retentionInBytes: 52428800
-  - name: csv-data
-    persisted: false
-    configuration:
-      partitions: 1
-      replicationFactor: 2
-      retentionInMinutes: 1440
       retentionInBytes: 52428800

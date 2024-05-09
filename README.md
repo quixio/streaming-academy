@@ -13,10 +13,10 @@ This repo contains a code and instructions to support series of episodes of Stre
      - Checkpointing
    - Quix Streams fundamentals
      - Application
-     - Produce message
      - DataFrame
+     - Produce message
+     - Creating transformation
      - Output DataFrame
-     - Group By (repartition)
      - Reprocessing
    - Practice part
      - Sign up
@@ -33,6 +33,7 @@ This repo contains a code and instructions to support series of episodes of Stre
    - State recovery
    - Partition reaasigment
    - Changelog topics
+   - Group By (repartition)
 3. Episode 3: Realtime ML inference
    - Architecture introduction
    - Model training
