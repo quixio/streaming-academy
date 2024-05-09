@@ -1,0 +1,62 @@
+# Quix Project Descriptor
+# This file describes the data pipeline and configuration of resources of a Quix Project.
+
+metadata:
+  version: 1.0
+
+# This section describes the Deployments of the data pipeline
+deployments:
+  - name: Web Gateway
+    application: web-gateway
+    deploymentType: Service
+    version: latest
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: webgateway
+    desiredStatus: Running
+    variables:
+      - name: output
+        inputType: OutputTopic
+        description: This is the output topic for hello world data
+        required: true
+        value: raw-data
+  - name: data-normalization
+    application: data-normalization
+    deploymentType: Service
+    version: latest
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: Name of the input topic to listen to.
+        required: true
+        value: raw-data
+      - name: output
+        inputType: OutputTopic
+        description: Name of the output topic to write to.
+        required: true
+        value: table-data
+
+# This section describes the Topics of the data pipeline
+topics:
+  - name: raw-data
+    persisted: false
+    configuration:
+      partitions: 2
+      replicationFactor: 2
+      retentionInMinutes: -1
+      retentionInBytes: 52428800
+  - name: table-data
+    persisted: false
+    configuration:
+      partitions: 2
+      replicationFactor: 2
+      retentionInMinutes: -1
+      retentionInBytes: 52428800
