@@ -8,8 +8,7 @@ metadata:
 deployments:
   - name: Replay demo data
     application: replay-svc
-    deploymentType: Service
-    desiredStatus: Stopped
+    deploymentType: Job
     version: latest
     resources:
       cpu: 200
