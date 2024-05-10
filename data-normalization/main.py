@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Application.Quix(
-    "data-normalization-v1.1",
+    "data-normalization-v1.2",
     auto_offset_reset="earliest")
 
 input_topic = app.topic(os.environ["input"])
