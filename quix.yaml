@@ -6,43 +6,21 @@ metadata:
 
 # This section describes the Deployments of the data pipeline
 deployments:
-  - name: Web Gateway
-    application: web-gateway
+  - name: Replay demo data
+    application: replay-svc
     deploymentType: Service
-    version: latest
-    resources:
-      cpu: 200
-      memory: 500
-      replicas: 1
-    publicAccess:
-      enabled: true
-      urlPrefix: webgateway
-    desiredStatus: Running
-    variables:
-      - name: output
-        inputType: OutputTopic
-        description: This is the output topic for hello world data
-        required: true
-        value: raw-data
-  - name: data-normalization
-    application: data-normalization
-    deploymentType: Service
+    desiredStatus: Stopped
     version: latest
     resources:
       cpu: 200
       memory: 500
       replicas: 1
     variables:
-      - name: input
-        inputType: InputTopic
-        description: Name of the input topic to listen to.
-        required: true
-        value: raw-data
       - name: output
         inputType: OutputTopic
-        description: Name of the output topic to write to.
+        description: Name of the output topic to write into
         required: true
-        value: table-data
+        value: raw-data
 
 # This section describes the Topics of the data pipeline
 topics:
