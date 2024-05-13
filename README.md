@@ -55,15 +55,10 @@ This step is optional, and you can develop whole pipeline locally but we recomme
 
 Sign up here: https://quix.io/signup
 
-## Create Flask Web Gateway
-This service is responsible to receive HTTP Post calls from our Sensor Logger app. 
-
-Go to library, search for source *Flask Web Gateway* and add it to your project. Then deploy service with public access enabled.
-
-After service is deployed, in deployment details you can copy url adress and set it in your sensor logger app. Example url: https://webgateway-tomas-streamingacademy-dev.deployments.quix.io
 
 
-## Install QuixCloud CLI
+
+## Install Quix CLI
 Quix CLI helps you to connect to your cloud infrastructure seamlessly as well as helps you with managing your pipeline locally. 
 
 ### Installation of Quix CLI
@@ -77,12 +72,6 @@ To install the Quix CLI, users have multiple methods depending on their operatin
   ```bash
   curl -fsSL https://github.com/quixio/quix-cli/raw/main/install.sh | sudo bash
   ```
-  
-- **Install with explicit version:**
-
-  ```bash
-  curl -fsSL https://github.com/quixio/quix-cli/raw/main/install.sh | sudo bash -s -- -v={version}
-  ```
 
 #### For Linux:
 
@@ -90,12 +79,6 @@ To install the Quix CLI, users have multiple methods depending on their operatin
 
     ```bash
     curl -fsSL https://github.com/quixio/quix-cli/raw/main/install.sh | sudo bash
-    ```
-    
-- **Install with explicit version:**
-
-    ```bash
-    curl -fsSL https://github.com/quixio/quix-cli/raw/main/install.sh | sudo bash -s -- -v={version}
     ```
 
 #### For Windows (PowerShell):
@@ -106,13 +89,6 @@ To install the Quix CLI, users have multiple methods depending on their operatin
   iwr https://github.com/quixio/quix-cli/raw/main/install.ps1 -useb | iex
   ```
   
-- **Install with explicit version:**
-
-  ```powershell
-  $quixCliInstall = (iwr https://github.com/quixio/quix-cli/raw/main/install.ps1 -useb).Content; $version="{version}"; iex "$quixCliInstall"
-  ```
-
-
 ## Python VENV
 Let's start with creating virtual environment for Python
 
@@ -120,6 +96,12 @@ Let's start with creating virtual environment for Python
 python3 -m venv venv
 source venv/bin/activate
 ```
+
+## Let's start with demo data source
+To simulate data source before we connect to real one, let's replay sample file with messages.  
+
+```
+quix local 
 
 ## Create Data normalization service
 
@@ -198,3 +180,14 @@ load_dotenv()
 As you can see in the example message, multiple sensors and multiple timestamps are included in one message from 
 
 
+
+
+
+
+
+## Create Flask Web Gateway
+This service is responsible to receive HTTP Post calls from our Sensor Logger app. 
+
+Go to library, search for source *Flask Web Gateway* and add it to your project. Then deploy service with public access enabled.
+
+After service is deployed, in deployment details you can copy url adress and set it in your sensor logger app. Example url: https://webgateway-tomas-streamingacademy-dev.deployments.quix.io
