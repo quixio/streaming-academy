@@ -48,19 +48,53 @@ This repo contains a code and instructions to support series of episodes of Stre
    - In-memory views
    - Consumer lag metrics
 
+# Episode 1
 
-
-## Sign up
-This step is optional, and you can develop whole pipeline locally but we recommend to use QuixCloud trial for your first project so you don't have to spent time on local infrastructure installation (Kafka or Docker).
-
-Sign up here: https://quix.io/signup
 
 ## Create new repo in GitHub
-Create new empty repository for your project.
+Create new empty repository for your project in GitHub. 
 
-## Create new project in Quix
-Select GitHub as your GIT provider and follow instructions on the right to connect Quix to 
+You should end up on empty project screen like this:
 
+![Empty GitHub project](/docs/images/git-hub-empty-project.png)
+
+## Sign up and create new project in Quix
+This step is optional, and you can develop whole pipeline locally but we recommend to use QuixCloud trial for your first project so you don't have to spent time on local infrastructure installation (Kafka or Docker).
+
+1. Sign up here: https://quix.io/signup
+2. Specify `project name` and select **Quix advanced configuration**
+   
+   ![Onboarding](docs/images/welcome-to-quix.png)
+
+3. Select **Connect your own Git repo**
+   - Copy **SSH URL** from your new GitHub repo
+   - Press **Copy to clipboard** button
+   - Follow instruction on the right to add your **SSH key**
+
+   ![GIT integration](docs/images/git-integration.png)
+
+4. Create main branch and future prod environment
+5. Finish tutorial by clicking next until project is created.
+
+### Create dev environment
+1. In QuixCloud, add **New environement**
+2. Name it Episode1
+3. Create new branch based on main called `ep1`
+4. Click next until done
+
+
+## Select your IDE
+You can develop locally, or use any of managed online IDEs. For this tutorial we recommend using GitHub codespaces. 
+
+### Create new GitHub CodeSpace
+Go to your GitHub repo homepage and click code:
+![Codespaces](/docs/images/github-codespaces.png)
+
+### Checkout dev branch
+```git
+git fetch
+git checkout ep1
+```
 
 ## Install Quix CLI
 Quix CLI helps you to connect to your cloud infrastructure seamlessly as well as helps you with managing your pipeline locally. 
