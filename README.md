@@ -132,7 +132,7 @@ To install the Quix CLI, users have multiple methods depending on their operatin
   iwr https://github.com/quixio/quix-cli/raw/main/install.ps1 -useb | iex
   ```
 
-### Login
+### Login
 Pair your local CLI context with your Cloud account:
 ```
 quix login
