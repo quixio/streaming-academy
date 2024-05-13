@@ -1,4 +1,4 @@
-name: replay-svc
+name: RAW data replay
 language: Python
 variables:
   - name: output
