@@ -34,19 +34,19 @@ This repo contains a code and instructions to support series of episodes of Stre
    - Partition reaasigment
    - Changelog topics
    - Group By (repartition)
-3. Episode 3: Realtime ML inference
-   - Architecture introduction
-   - Model training
-   - Model deployment
-   - Model KPIs
-   - A/B testing
-4. Episode 4: Application development
+3. Episode 3: Application development
    - Common ways to integrate stream processing pipelines with end apps
    - WebAPI ingestion
    - WebSocket ingestion
    - WebSocket consumption
    - In-memory views
    - Consumer lag metrics
+4. Episode 4: Realtime ML inference
+   - Architecture introduction
+   - Model training
+   - Model deployment
+   - Model KPIs
+   - A/B testing
 
 # Episode 1
 
