@@ -55,7 +55,11 @@ This step is optional, and you can develop whole pipeline locally but we recomme
 
 Sign up here: https://quix.io/signup
 
+## Create new repo in GitHub
+Create new empty repository for your project.
 
+## Create new project in Quix
+Select GitHub as your GIT provider and follow instructions on the right to connect Quix to 
 
 
 ## Install Quix CLI
@@ -88,7 +92,13 @@ To install the Quix CLI, users have multiple methods depending on their operatin
   ```powershell
   iwr https://github.com/quixio/quix-cli/raw/main/install.ps1 -useb | iex
   ```
-  
+
+### Login
+Pair your local CLI context with your Cloud account:
+```
+quix login
+```
+
 ## Python VENV
 Let's start with creating virtual environment for Python
 
@@ -100,8 +110,87 @@ source venv/bin/activate
 ## Let's start with demo data source
 To simulate data source before we connect to real one, let's replay sample file with messages.  
 
+### Create new service from template
 ```
-quix local 
+quix local apps create demo-data-source -p raw-replay
+cd raw-replay/
+```
+Then download sample data file: 
+```
+wget https://raw.githubusercontent.com/tomas-quix/streaming-academy/main/file-sink/demo_stream.json
+```
+
+### Edit service settings and code
+Edit app.yaml to send data to raw topic:
+
+```yaml
+name: RAW data replay
+language: Python
+variables:
+  - name: output
+    inputType: OutputTopic
+    description: Name of the output topic to write into
+    defaultValue: raw-data
+    required: true
+dockerfile: dockerfile
+runEntryPoint: main.py
+defaultFile: main.py
+```
+
+### pip install
+Install Raw replay Python dependencies specified in `requirements.txt`:
+```
+pip install -r requirements.txt 
+```
+
+change main.py to send data from `demo_stream.json`:
+
+```python
+from quixstreams import Application
+import json
+import time
+import os
+
+# import the dotenv module to load environment variables from a file
+from dotenv import load_dotenv
+load_dotenv(override=False)
+
+# Create an Application.
+app = Application.Quix()
+
+# Define the topic using the "output" environment variable
+topic_name = os.getenv("output", "")
+if topic_name == "":
+    raise ValueError("The 'output' environment variable is required. This is the output topic that data will be published to.")
+
+topic = app.topic(topic_name)
+
+with app.get_producer() as producer:
+    with open("demo_stream.json", 'r') as file:
+        for line in file:
+            # Remove newline characters from the message
+            message = json.loads(line.strip())
+            
+            # Publish message to Kafka
+            producer.produce(topic.name, json.dumps(message), "demo_stream.json")
+
+            print(message)
+            time.sleep(1)
+
+    producer.flush(30)  # Wait for all messages to be delivered
+    print('All messages have been flushed to the Kafka topic')
+```
+
+### Running replay
+Now last step is to run replay service and produce some sample data into `raw-data` topic so we can continue building our pipeline:
+
+```
+python3 main.py
+```
+
+#### Inspecting data
+Go to https://portal.platform.quix.io/topics to check data in topics.
+
 
 ## Create Data normalization service
 
