@@ -90,6 +90,11 @@ You can develop locally, or use any of managed online IDEs. For this tutorial we
 Go to your GitHub repo homepage and click code:
 ![Codespaces](/docs/images/github-codespaces.png)
 
+### Install extensions handy for the project
+- ms-python.python
+- ms-python.vscode-pylance
+- ms-python.debugpy
+
 ### Checkout dev branch
 ```git
 git fetch
@@ -154,12 +159,20 @@ Then download sample data file:
 wget https://raw.githubusercontent.com/tomas-quix/streaming-academy/main/file-sink/demo_stream.json
 ```
 
-### Edit service settings and code
-Edit app.yaml to send data to raw topic:
+### Edit service settings and code
+
+In order to set up our development environment with QuixCloud, we need to set local context to one of our environment. Run:
+```
+quix use
+```
+
+and select our project we have created and `Episode1` environmnent. 
+
+Then edit app.yaml variables to configure output topic to send data to `raw-data`:
 
 ```yaml
 name: RAW data replay
-language: Python
+language: python
 variables:
   - name: output
     inputType: OutputTopic
@@ -170,14 +183,34 @@ dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py
 ```
+then we create local `.env` file to inject environment variables into the runtime using:
+```
+quix local vars export
+```
 
+This will create `.env` file:
+```
+Quix__Portal__Api=https://portal-api.platform.quix.io
+Quix__Organisation__Id=tomas
+Quix__Workspace__Id=tomas-academytest1-episode1
+Quix__Sdk__Token=sdk-17a8da224d2e481886********
+output=raw-data
+
+```
+
+These environment variables are then injected into the runtime because of these lines at the top of the `main.py`:
+
+```python
+from dotenv import load_dotenv
+load_dotenv()
+```
 ### pip install
-Install Raw replay Python dependencies specified in `requirements.txt`:
+Install service Python dependencies specified in `requirements.txt`:
 ```
 pip install -r requirements.txt 
 ```
 
-change main.py to send data from `demo_stream.json`:
+change main.py to send data from `demo_stream.json` that we donwloaded with wget command couple of steps above:
 
 ```python
 from quixstreams import Application
@@ -222,12 +255,16 @@ Now last step is to run replay service and produce some sample data into `raw-da
 python3 main.py
 ```
 
-#### Inspecting data
-Go to https://portal.platform.quix.io/topics to check data in topics.
+### Inspecting data
+Go to topics tab in project to inspect data being send to topic:
+
+![Topic inspection](/docs/images/topic-data-inspection.png)
 
 
-## Create Data normalization service
+## Creating Data normalization service
+Now we have sucesfully created ingestion pipeline for our data, we can proccess them. Later we will replace Replay service with real data producer, a Flask Web API gateway ingesting real data from phones. 
 
+Let's start with creating new service from `starter-transformation` template:
 ```
 quix local apps create starter-transformation -p data-normalization
 cd data-normalization
