@@ -11,19 +11,11 @@ This repo contains a code and instructions to support series of episodes of Stre
      - Partitions
      - Consumer groups
      - Checkpointing
-   - Quix Streams fundamentals
-     - Application
-     - DataFrame
-     - Produce message
-     - Creating transformation
-     - Output DataFrame
-     - Reprocessing
    - Practice part
-     - Sign up
-     - Create a project
-     - Create an environment
-     - Setting up GitHub codespaces
-     - Creating Flask WebGateway producer
+     - Local pipeline
+     - Connect to local RedPanda broker
+     - Create producer service
+     - Deploy service locally
      - Building data normalization service
 2. Episode 2: Stateful data transformations
    - Usecases
@@ -34,6 +26,9 @@ This repo contains a code and instructions to support series of episodes of Stre
    - Partition reaasigment
    - Changelog topics
    - Group By (repartition)
+   - Quix Streams
+     - Application
+     - Reprocessing
 3. Episode 3: Application development
    - Common ways to integrate stream processing pipelines with end apps
    - WebAPI ingestion
