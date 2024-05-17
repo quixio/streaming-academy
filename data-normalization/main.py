@@ -1,6 +1,5 @@
 import os
 from quixstreams import Application
-
 import uuid
 import json
 
@@ -8,34 +7,36 @@ import json
 from dotenv import load_dotenv
 load_dotenv()
 
-app = Application.Quix(
-    "data-normalization-v1.2",
-    auto_offset_reset="earliest")
+app = Application(consumer_group="data-normalisation-v1", auto_offset_reset="earliest")
 
 input_topic = app.topic(os.environ["input"])
 output_topic = app.topic(os.environ["output"])
 
 sdf = app.dataframe(input_topic)
 
-
-sdf = sdf.apply(lambda row: row["payload"], expand=True)
+sdf = sdf.apply(lambda message: message["payload"], expand=True)
 
 def transpose(row: dict):
 
-    result = {
+    new_row = {
         "time": row["time"]
     }
 
-    column_name_prefix = row["name"]
+    for key in row["values"]:
+        new_row[row["name"] + "-" + key] = row["values"][key]
 
-    for dimension in row["values"]:
-        result[column_name_prefix + "-" + dimension] = row["values"][dimension]
+    return new_row
 
-    return result
 
-sdf = sdf.apply(transpose)        
+sdf = sdf.apply(transpose)
 
-sdf = sdf.update(lambda row: print(json.dumps(row, indent=4)))
+sdf = sdf[sdf.contains("accelerometer-x")]
+sdf = sdf[["time", "accelerometer-x", 'accelerometer-y', "accelerometer-z"]]
+
+sdf["accelerometer-total"] = sdf["accelerometer-x"].abs() + sdf["accelerometer-y"].abs() + sdf["accelerometer-z"].abs()
+
+sdf = sdf[sdf["accelerometer-total"] > 50]
+sdf = sdf.update(lambda row: print(list(row.values())))
 
 sdf = sdf.to_topic(output_topic)
 
