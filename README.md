@@ -2,6 +2,7 @@
 This repo contains a code and instructions to support series of episodes of Streaming Academy. This series goal is to teach Data engineers and Software Engineers how to build and develop redistributed fault-tolerant streaming architectures using Kafka and Python. 
 
 ## Curriculum
+
 1. Episode 1: Intro to stream processing
    - What is stream processing
    - Motivation
@@ -11,37 +12,76 @@ This repo contains a code and instructions to support series of episodes of Stre
      - Partitions
      - Consumer groups
      - Checkpointing
+   - Quix Streams fundamentals
+     - Basic architecture
+     - Streaming DataFrame
    - Practice part
-     - Local pipeline
+     - Produce message
+     - Replaying data
      - Connect to local RedPanda broker
+     - Local pipeline
      - Create producer service
      - Deploy service locally
      - Building data normalization service
-2. Episode 2: Stateful data transformations
-   - Usecases
+   - Homework
+     - Invite your friends and colleagues to Episode 2
+
+2. Episode 2: Stateful data transformations basics
+   - Use cases
    - State fundamentals
    - Basic state operations
    - Windows
-   - State recovery
-   - Partition reaasigment
-   - Changelog topics
-   - Group By (repartition)
-   - Quix Streams
-     - Application
-     - Reprocessing
-3. Episode 3: Application development
-   - Common ways to integrate stream processing pipelines with end apps
+   - Homework
+     
+3. Episode 3: Stateful use case - downsampling (InfluxDB)
+   - Pre-episode homework
+     - sign up to InfluxDB Serverless
+   - Time series data
+   - Time series database
+   - Downsampling
+   - Homework
+  
+4. Episode 4: Deploy to the cloud (with Redpanda)
+   - Pre-episode homework
+     - Sign up (Redpanda serverless)
+     - Sign up (Quix Cloud)
+   - Configure Quix Cloud to connect to Redpanda
+   - Connect Quix Cloud to your GitHub repository
+   - Deploy your repo to production
+   - Implementing a new feature
+     - Consuming production data
+     - Implementation
+     - Creating PR
+     - Releasing to production
+   - Monitoring + Observability 
+   - Homework
+  
+5. Episode 5: Application development
+   - Common ways to integrate stream processing pipelines with third party systems
    - WebAPI ingestion
    - WebSocket ingestion
    - WebSocket consumption
    - In-memory views
    - Consumer lag metrics
-4. Episode 4: Realtime ML inference
+
+6. Episode 6: Advanced stateful processing
+   - State recovery
+   - Partition reassignment
+   - Changelog topics
+   - Group By (repartition)
+   - Homework
+
+7. Episode 7: Realtime ML inference
    - Architecture introduction
    - Model training
    - Model deployment
    - Model KPIs
    - A/B testing
+   - Homework
+
+Episode X: GenAI
+
+---
 
 # Episode 1
 
