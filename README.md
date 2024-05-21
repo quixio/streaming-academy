@@ -15,7 +15,6 @@ This repo contains a code and instructions to support series of episodes of Stre
    - Quix Streams fundamentals
      - Basic architecture
      - Streaming DataFrame
-
    - Practice part
      - Produce message
      - Replaying data
@@ -58,12 +57,12 @@ This repo contains a code and instructions to support series of episodes of Stre
    - Homework
   
 5. Episode 5: Application development
-  - Common ways to integrate stream processing pipelines with third party systems
-  - WebAPI ingestion
-  - WebSocket ingestion
-  - WebSocket consumption
-  - In-memory views
-  - Consumer lag metrics
+   - Common ways to integrate stream processing pipelines with third party systems
+   - WebAPI ingestion
+   - WebSocket ingestion
+   - WebSocket consumption
+   - In-memory views
+   - Consumer lag metrics
 
 6. Episode 6: Advanced stateful processing
    - State recovery
