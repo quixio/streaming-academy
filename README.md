@@ -12,26 +12,20 @@ This repo contains a code and instructions to support series of episodes of Stre
      - Partitions
      - Consumer groups
      - Checkpointing
+   - Quix Streams fundamentals
+     - Basic architecture
+     - Streaming DataFrame
+
    - Practice part
-     - Local pipeline
+     - Produce message
+     - Replaying data
      - Connect to local RedPanda broker
+     - Local pipeline
      - Create producer service
      - Deploy service locally
      - Building data normalization service
-   - Quix Streams fundamentals
-     - Application
-     - DataFrame
-     - Produce message
-     - Creating transformation
-     - Output DataFrame
-     - Reprocessing
    - Homework
-     - Sign up
-     - Create a project
-     - Create an environment
-     - Setting up GitHub codespaces
-     - Creating Flask WebGateway producer
-     - Building data normalization service
+     - Invite your friends and colleagues to Episode 2
 
 2. Episode 2: Stateful data transformations basics
    - Use cases
@@ -39,39 +33,43 @@ This repo contains a code and instructions to support series of episodes of Stre
    - Basic state operations
    - Windows
    - Homework
-
+     
 3. Episode 3: Stateful use case - downsampling (InfluxDB)
+   - Pre-episode homework
+     - sign up to InfluxDB Serverless
    - Time series data
    - Time series database
    - Downsampling
-   - Homework (sign up to InfluxDB Serverless)
+   - Homework
+  
+4. Episode 4: Deploy to the cloud (with Redpanda)
+   - Pre-episode homework
+     - Sign up (Redpanda serverless)
+     - Sign up (Quix Cloud)
+   - Configure Quix Cloud to connect to Redpanda
+   - Connect Quix Cloud to your GitHub repository
+   - Deploy your repo to production
+   - Implementing a new feature
+     - Consuming production data
+     - Implementation
+     - Creating PR
+     - Releasing to production
+   - Monitoring + Observability 
+   - Homework
+  
+5. Episode 5: Application development
+  - Common ways to integrate stream processing pipelines with third party systems
+  - WebAPI ingestion
+  - WebSocket ingestion
+  - WebSocket consumption
+  - In-memory views
+  - Consumer lag metrics
 
-4. Episode 4: Advanced stateful processing
+6. Episode 6: Advanced stateful processing
    - State recovery
    - Partition reassignment
    - Changelog topics
    - Group By (repartition)
-   - Homework
-
-5. Episode 5: Deploy to the cloud (with Redpanda)
-   - Sign up (Redpanda serverless)
-   - Configure Quix Cloud
-   - Connect Quix Cloud to your GitHub repository
-   - Deploy your repo to production
-   - Implementing a new feature
-   - Consuming production data
-   - Implementing a new feature
-   - Creating PR
-   - Releasing to production
-   - Homework
-
-6. Episode 6: Pipeline development
-   - Common ways to integrate stream processing pipelines with end apps
-   - WebAPI ingestion
-   - WebSocket ingestion
-   - WebSocket consumption
-   - In-memory views
-   - Consumer lag metrics
    - Homework
 
 7. Episode 7: Realtime ML inference
