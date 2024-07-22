@@ -6,10 +6,10 @@ metadata:
 
 # This section describes the Deployments of the data pipeline
 deployments:
-  - name: Replay demo data
-    application: replay-svc
-    deploymentType: Job
+  - name: raw-replay
+    application: raw-replay
     version: latest
+    deploymentType: Service
     resources:
       cpu: 200
       memory: 500
@@ -20,15 +20,28 @@ deployments:
         description: Name of the output topic to write into
         required: true
         value: raw-data
-  - name: Data Normalization
-    application: data-normalization
-    deploymentType: Service
+  - name: file-sink
+    application: file-sink
     version: latest
+    deploymentType: Service
     resources:
       cpu: 200
       memory: 500
       replicas: 1
-    desiredStatus: Running
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: Name of the input topic to listen to.
+        required: false
+        value: raw-data
+  - name: data-normalization
+    application: data-normalization
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
     variables:
       - name: input
         inputType: InputTopic
@@ -40,41 +53,8 @@ deployments:
         description: Name of the output topic to write to.
         required: true
         value: table-data
-  - name: phone-raw-data-replay
-    application: phone-raw-data-replay
-    deploymentType: Service
-    version: latest
-    resources:
-      cpu: 200
-      memory: 500
-      replicas: 1
-    variables:
-      - name: output
-        inputType: OutputTopic
-        description: Name of the output topic to write into
-        required: true
-        value: f1-data
 
 # This section describes the Topics of the data pipeline
 topics:
   - name: raw-data
-    persisted: false
-    configuration:
-      partitions: 2
-      replicationFactor: 2
-      retentionInMinutes: -1
-      retentionInBytes: 52428800
   - name: table-data
-    persisted: false
-    configuration:
-      partitions: 2
-      replicationFactor: 2
-      retentionInMinutes: -1
-      retentionInBytes: 52428800
-  - name: f1-data
-    persisted: false
-    configuration:
-      partitions: 1
-      replicationFactor: 2
-      retentionInMinutes: 1440
-      retentionInBytes: 52428800
