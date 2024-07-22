@@ -201,7 +201,7 @@ cd raw-replay/
 ```
 Then download sample data file: 
 ```
-wget https://raw.githubusercontent.com/tomas-quix/streaming-academy/main/file-sink/demo_stream.json
+wget https://raw.githubusercontent.com/tomas-quix/streaming-academy/main/demo_stream.json
 ```
 
 ### pip install
