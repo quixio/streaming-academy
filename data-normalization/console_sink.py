@@ -9,10 +9,10 @@ class ConsoleSink:
         self._max_columns = max_columns
         self._max_column_width = max_column_width
         self._rows = []
-        self._columns = set()
+        self._columns = []
         
         
-    def print_with_metadata(self, row: dict, key: str, timestamp: int):
+    def print_with_metadata(self, row: dict, key: str, timestamp: int, _):
         row_with_metadata = {
             "[time]": str(datetime.fromtimestamp(timestamp / 1000)),
             "[key]": key,
@@ -27,8 +27,11 @@ class ConsoleSink:
         self._rows.append(row)
         
         # Update current columns
-        self._columns = set(row.keys()) | self._columns
-        current_columns = list(sorted(self._columns))
+        for column in row.keys():
+            if column not in self._columns:
+                self._columns.append(column)
+     
+        current_columns = self._columns
 
         if len(current_columns) > self._max_columns:
             current_columns = list(current_columns)[:self._max_columns]
