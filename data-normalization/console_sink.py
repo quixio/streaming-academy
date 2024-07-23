@@ -3,14 +3,16 @@ from prettytable.colortable import ColorTable, Themes
 from datetime import datetime
 
 class ConsoleSink:
-    def __init__(self, table_width :int = 150, rows_visible: int = 5, max_columns :int = 5) -> None:
+    def __init__(self, table_width :int = 150, max_column_width: int = 20, rows_visible: int = 5, max_columns :int = 5) -> None:
         self._rows_visible = rows_visible
         self._table_width = table_width
         self._max_columns = max_columns
+        self._max_column_width = max_column_width
         self._rows = []
+        self._columns = set()
         
         
-    def print_with_metadata(self, row: dict, key: str, timestamp: int, _):
+    def print_with_metadata(self, row: dict, key: str, timestamp: int):
         row_with_metadata = {
             "[time]": str(datetime.fromtimestamp(timestamp / 1000)),
             "[key]": key,
@@ -25,7 +27,9 @@ class ConsoleSink:
         self._rows.append(row)
         
         # Update current columns
-        current_columns = row.keys()
+        self._columns = set(row.keys()) | self._columns
+        current_columns = list(sorted(self._columns))
+
         if len(current_columns) > self._max_columns:
             current_columns = list(current_columns)[:self._max_columns]
             current_columns.append("...")
@@ -36,8 +40,8 @@ class ConsoleSink:
         table = ColorTable(current_columns, theme=Themes.OCEAN)
 
         # Set max width for each column
-        #for col in current_columns:
-            #table.max_width[col] = self._column_width
+        for col in current_columns:
+            table.max_width[col] = self._max_column_width
 
         table.max_table_width = self._table_width
 
@@ -53,8 +57,14 @@ class ConsoleSink:
             for column in current_columns:
                 if column is "...":
                     row_cells.append("...")
+                elif column in row:
+                    cell_content = str(row[column])
+                    if len(cell_content) > self._max_column_width:
+                        cell_content = cell_content[:self._max_column_width - 3] + "..."
+
+                    row_cells.append(cell_content)
                 else:
-                    row_cells.append(row[column])
+                    row_cells.append(" ")
 
             table.add_row(row_cells)
 
