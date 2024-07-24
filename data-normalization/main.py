@@ -1,16 +1,18 @@
 import os
-from quixstreams import Application
-import uuid
-import json
+from quixstreams import Application, State
+from console_sink import ConsoleSink
 
 # for local dev, load env vars from a .env file
 from dotenv import load_dotenv
 load_dotenv()
 
-app = Application(consumer_group="data-normalisation-v1", auto_offset_reset="earliest")
+
+app = Application(consumer_group="odometer-v1.5", auto_offset_reset="earliest")
 
 input_topic = app.topic(os.environ["input"])
 output_topic = app.topic(os.environ["output"])
+console_sink = ConsoleSink()
+
 
 sdf = app.dataframe(input_topic)
 
@@ -27,16 +29,18 @@ def transpose(row: dict):
 
     return new_row
 
-
 sdf = sdf.apply(transpose)
 
-sdf = sdf[sdf.contains("accelerometer-x")]
-sdf = sdf[["time", "accelerometer-x", 'accelerometer-y', "accelerometer-z"]]
+sdf = sdf.hopping_window(10000, 1000, 1000) \
+        .reduce(lambda window, row: {**window, **row}, lambda row: row) \
+        .final()
 
-sdf["accelerometer-total"] = sdf["accelerometer-x"].abs() + sdf["accelerometer-y"].abs() + sdf["accelerometer-z"].abs()
+sdf = sdf.apply(lambda row: {
+    **row["value"],
+    "time": row["end"]
+})
 
-sdf = sdf[sdf["accelerometer-total"] > 50]
-sdf = sdf.update(lambda row: print(list(row.values())))
+sdf = sdf.update(console_sink.print_with_metadata, metadata=True)
 
 sdf = sdf.to_topic(output_topic)
 

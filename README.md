@@ -84,7 +84,7 @@ Episode X: GenAI
 ---
 
 # Episode 1
-
+Link to the video: [youtube.com](https://www.youtube.com/watch?v=cjhBCLRa48Q)
 
 ## Create new repo in GitHub
 Create new empty repository for your project in GitHub. 
@@ -201,7 +201,7 @@ cd raw-replay/
 ```
 Then download sample data file: 
 ```
-wget https://raw.githubusercontent.com/tomas-quix/streaming-academy/main/file-sink/demo_stream.json
+wget https://raw.githubusercontent.com/tomas-quix/streaming-academy/main/demo_stream.json
 ```
 
 ### pip install
@@ -775,4 +775,269 @@ and
 
 ```
 quix local pipeline up
+```
+
+# Episode 2
+
+Link to the video: [youtube.com](https://www.youtube.com/watch?v=61xradVrKwQ)
+
+In this episode we are going to use stateful processing to normalize our misaligned data using hopping windows. 
+
+In order to improve visualization of the data I have added PrettyTable to Data Normalization service. 
+![PrettyTable](/docs/images/pretty-table.jpeg)
+
+You need file [console_sink.py](/data-normalization/console_sink.py) in order to use it. Otherwise just use `sdf = sdf.update(print)`
+
+
+First let's get rid of filters and projections we added at the end of Episode 1. This is our starting point then:
+```python
+import os
+from quixstreams import Application, State
+from console_sink import ConsoleSink
+
+# for local dev, load env vars from a .env file
+from dotenv import load_dotenv
+load_dotenv()
+
+
+app = Application(consumer_group="odometer-v1.5", auto_offset_reset="earliest")
+
+input_topic = app.topic(os.environ["input"])
+output_topic = app.topic(os.environ["output"])
+console_sink = ConsoleSink()
+
+
+sdf = app.dataframe(input_topic)
+
+sdf = sdf.apply(lambda message: message["payload"], expand=True)
+
+def transpose(row: dict):
+
+    new_row = {
+        "time": row["time"]
+    }
+
+    for key in row["values"]:
+        new_row[row["name"] + "-" + key] = row["values"][key]
+
+    return new_row
+
+sdf = sdf.apply(transpose)
+
+sdf = sdf[sdf.contains("accelerometer-x")]
+
+sdf["accelerometer-total"] = sdf["accelerometer-x"].abs() + sdf["accelerometer-y"].abs() + sdf["accelerometer-z"].abs()
+
+sdf = sdf.update(console_sink.print)
+
+#sdf = sdf.to_topic(output_topic)
+
+if __name__ == "__main__":
+    app.run(sdf)
+```
+
+This will render data like this:
+```
++---------------------+---------------------+----------------------+---------------------+---------------------+
+| accelerometer-total |   accelerometer-x   |   accelerometer-y    |   accelerometer-z   |         time        |
++---------------------+---------------------+----------------------+---------------------+---------------------+
+|         ...         |         ...         |         ...          |         ...         |         ...         |
+|  10.162986818912625 |  4.907982470417022  | -1.3199994799941777  | -3.9350048685014247 | 1715254407478859000 |
+|  9.694509183202683  |  3.3571129183486104 |  3.3870921692878007  |  2.9503040955662727 | 1715254407528867800 |
+|  1.590272172652185  | -0.7619710449576378 | -0.04575783482939005 | -0.7825432928651571 | 1715254407578877000 |
+|  8.793086997456848  |  -4.751639231538772 | -0.4465983968570828  |  -3.594849369060993 | 1715254407628886000 |
+|  13.906442110598086 |  -7.645883001708984 |  0.5143506213515997  |  -5.746208487537503 | 1715254407678895000 |
++---------------------+---------------------+----------------------+---------------------+---------------------+
+```
+
+## Odometer (Sum aggregation)
+
+```python
+def odometer(row:dict, state: State):
+
+    odometer = state.get("odo", 0)
+    odometer += row["accelerometer-total"]
+    state.set("odo", odometer)
+
+    return odometer
+
+sdf = sdf.apply(odometer, stateful=True)
+sdf = sdf.update(print)
+```
+
+This will render forever increasing number:
+```
+979.179732379717
+4979.239616939577
+4979.45256761634
+4979.556884023123
+4979.746151626481
+4979.796649641575
+4979.953991828363
+4980.082425316052
+4980.228895980214
+4980.301952448596
+4980.4522055539055
+4980.580047797704
+4980.908325227823
+4981.154737444684
+4981.224264569896
+4981.398837000687
+4981.614090985957
+4981.704197373339
+4981.790215030103
+4982.019386189305
+4982.142447628567
+4982.22129144818
+4982.4055146276305
+4982.569420410718
+4982.660622776643
+4982.724532646496
+4982.849878981825
+4982.911196497097
+4983.004259396198
+```
+
+## Tumbling windows
+Lets perform tumbling window with mean aggregation over the `accelerometer-total` column:
+```python
+sdf = sdf.apply(lambda row: row["accelerometer-total"]) \
+    .tumbling_window(2000, 1000) \
+    .mean() \
+    .final()
+
+# Just for better visualization, remove when writing to output topic.
+sdf["start"] = sdf["start"].apply(lambda epoch: str(datetime.fromtimestamp(epoch / 1000)))
+sdf["end"] = sdf["end"].apply(lambda epoch: str(datetime.fromtimestamp(epoch / 1000)))
+
+sdf = sdf.update(console_sink.print)
+```
+
+this will render:
+```
++---------------------+---------------------+---------------------+
+|        start        |         end         |        value        |
++---------------------+---------------------+---------------------+
+|         ...         |         ...         |         ...         |
+| 2024-07-23 08:34:32 | 2024-07-23 08:34:34 | 0.14932685365689918 |
+| 2024-07-23 08:34:34 | 2024-07-23 08:34:36 | 0.09565322246797382 |
+| 2024-07-23 08:34:36 | 2024-07-23 08:34:38 |  0.1288766977590881 |
+| 2024-07-23 08:34:38 | 2024-07-23 08:34:40 | 0.12598890389570966 |
+| 2024-07-23 08:34:40 | 2024-07-23 08:34:42 | 0.09342559128006919 |
++---------------------+---------------------+---------------------+
+```
+
+### Custom reduce function
+If you need custom aggregation, you can use `.reduce()` API:
+
+```python
+def mean_reduce(window: dict, value: float):
+    window["sum"] += value
+    window["count"] += 1
+    return window
+
+def mean_init(value: float):
+    return {
+        "sum": value,
+        "count": 1
+    }
+
+
+sdf = sdf.apply(lambda row: row["accelerometer-total"]) \
+    .tumbling_window(2000, 1000) \
+    .reduce(mean_reduce, mean_init) \
+    .final()
+
+sdf["value"] = sdf["value"]["sum"] / sdf["value"]["count"]
+
+# Just for better visualization, remove when writing to output topic.
+sdf["start"] = sdf["start"].apply(lambda epoch: str(datetime.fromtimestamp(epoch / 1000)))
+sdf["end"] = sdf["end"].apply(lambda epoch: str(datetime.fromtimestamp(epoch / 1000)))
+
+sdf = sdf.update(console_sink.print)
+```
+
+This will render exactly the same data as previous example. 
+
+### Hopping window 
+
+```python
+sdf = sdf.apply(lambda row: row["accelerometer-total"]) \
+    .hopping_window(4000, 2000, 1000) \
+    .reduce(mean_reduce, mean_init) \
+    .final()
+```
+
+this will render:
+```
++---------------------+---------------------+---------------------+
+|        start        |         end         |        value        |
++---------------------+---------------------+---------------------+
+|         ...         |         ...         |         ...         |
+| 2024-07-23 08:56:26 | 2024-07-23 08:56:30 | 0.10751399724688382 |
+| 2024-07-23 08:56:28 | 2024-07-23 08:56:32 | 0.12998267893308774 |
+| 2024-07-23 08:56:30 | 2024-07-23 08:56:34 |  0.1276151241645776 |
+| 2024-07-23 08:56:32 | 2024-07-23 08:56:36 | 0.09845571632133795 |
+| 2024-07-23 08:56:34 | 2024-07-23 08:56:38 | 0.08961228006960824 |
++---------------------+---------------------+---------------------+
+```
+
+## Data Normalization
+Data are arriving particularly missaligned. Data from the device looks like this:
+```
++-----------------+-----------------+----------------------+-------------------+
+|       time      | accelerometer-z | battery-batteryLevel | location-altitude |
++-----------------+-----------------+----------------------+-------------------+
+| 171525441132... | -0.021757073... |                      |                   |
+| 171525441137... | -0.040846974... |                      |                   |
+| 171525441142... | 0.0231324537... |                      |                   |
+| 171525441147... | -0.058454527... |                      |                   |
+| 171525441152... | 0.0354296252... |                      |                   |
+| 171525441157... |                 |         0.75         |                   |
+| 171525441157... | -0.011672902... |                      |                   |
+| 171525441162... | -0.057761868... |                      |                   |
+| 171525441167... | 0.0527004935... |                      |                   |
+| 171525441172... | -0.057727381... |                      |                   |
+| 171525441177... | -0.012996844... |                      |                   |
+| 171525441182... | 0.0204348852... |                      |                   |
+| 171525441187... | -0.075468790... |                      |                   |
+| 171525441192... | 0.0370294617... |                      |                   |
+| 171525441197... | -0.025990181... |                      |                   |
+| 171525441202... | -0.017441548... |                      |                   |
+| 171525441207... | -0.024626491... |                      |                   |
+| 171525441200... |                 |                      |  249.04045523...  |
+| 171525441212... | -0.041283612... |                      |                   |
+| 171525441217... | 0.0210392808... |                      |                   |
++-----------------+-----------------+----------------------+-------------------+
+```
+
+This might be difficult to use in service where we want to use accelerometer, location or battery modules at the same time. For that reason we are going to normalize data to uniform frequency and use last value known for that timestamp to build evenly distributed table looking more like this:
+```
++---------------+-----------------+----------------------+----------------------+-----+
+|      time     | accelerometer-x | battery-batteryLevel | battery-batteryState | ... |
++---------------+-----------------+----------------------+----------------------+-----+
+| 1721727161000 | -7.645883001... |         0.75         |      unplugged       | ... |
+| 1721727162000 | 26.581488322... |         0.75         |      unplugged       | ... |
+| 1721727163000 | -44.99809431... |         0.75         |      unplugged       | ... |
+| 1721727164000 | 53.154980386... |         0.75         |      unplugged       | ... |
+| 1721727165000 | 0.4243703445... |         0.75         |      unplugged       | ... |
+| 1721727166000 | -23.91999649... |         0.75         |      unplugged       | ... |
+| 1721727167000 | 4.1758863392... |         0.75         |      unplugged       | ... |
+| 1721727168000 | 1.9415555075... |         0.75         |      unplugged       | ... |
+| 1721727169000 | -1.295200846... |         0.75         |      unplugged       | ... |
+| 1721727170000 | 0.2961559795... |         0.75         |      unplugged       | ... |
++---------------+-----------------+----------------------+----------------------+-----+
+```
+
+We are going to use hopping windows to normalize them:
+
+```python
+sdf = sdf.hopping_window(10000, 1000, 1000) \
+        .reduce(lambda window, row: {**window, **row}, lambda row: row) \
+        .final()
+
+sdf = sdf.apply(lambda row: {
+    **row["value"],
+    "time": row["end"]
+})
 ```
