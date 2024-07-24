@@ -888,7 +888,7 @@ this will render:
 ```
 
 ### Custom reduce function
-If you need custom aggregation, you can use `.reduce()` API:
+If you need a custom aggregation, you can use `.reduce()` API:
 
 ```python
 def mean_reduce(window: dict, value: float):
@@ -971,7 +971,7 @@ Data are arriving particularly missaligned. Data from the device looks like this
 +-----------------+-----------------+----------------------+-------------------+
 ```
 
-This might be difficult to use in service where we want to use accelerometer, location or battery modules at the same time. For that reason we are going to normalize data to uniform frequency and use last value known for that timestamp to build evenly distributed table looking more like this:
+This might be difficult to use in a service where we want to use accelerometer, location or battery modules at the same time. For that reason we are going to normalize data to a uniform frequency and use the last value known for that timestamp to build an evenly distributed table looking more like this:
 ```
 +---------------+-----------------+----------------------+----------------------+-----+
 |      time     | accelerometer-x | battery-batteryLevel | battery-batteryState | ... |
