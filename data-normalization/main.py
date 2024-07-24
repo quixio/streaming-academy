@@ -6,8 +6,7 @@ from console_sink import ConsoleSink
 from dotenv import load_dotenv
 load_dotenv()
 
-
-app = Application(consumer_group="odometer-v1.5", auto_offset_reset="earliest")
+app = Application(consumer_group="odometer-v1.7", auto_offset_reset="earliest")
 
 input_topic = app.topic(os.environ["input"])
 output_topic = app.topic(os.environ["output"])

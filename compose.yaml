@@ -1,12 +1,13 @@
 services:
-  raw-replay:
+  downsampling:
     volumes:
       - /dev/null:/app/.env
     build:
-      context: raw-replay
+      context: downsampling
       dockerfile: dockerfile
     environment:
-      output: raw-data
+      input: table-data
+      output: table-data-10s
       Quix__Broker__Address: kafka-broker:9092
   data-normalization:
     volumes:
@@ -17,6 +18,38 @@ services:
     environment:
       input: raw-data
       output: table-data
+      Quix__Broker__Address: kafka-broker:9092
+  raw_data_replay:
+    volumes:
+      - /dev/null:/app/.env
+    build:
+      context: raw-replay
+      dockerfile: dockerfile
+    environment:
+      output: raw-data
+      Quix__Broker__Address: kafka-broker:9092
+  file-sink:
+    volumes:
+      - /dev/null:/app/.env
+    build:
+      context: file-sink
+      dockerfile: dockerfile
+    environment:
+      input: raw-data
+      Quix__Broker__Address: kafka-broker:9092
+  influx-db-sink:
+    volumes:
+      - /dev/null:/app/.env
+    build:
+      context: influx-db-sink
+      dockerfile: dockerfile
+    environment:
+      input: table-data-10s
+      INFLUXDB_TOKEN: WvTdLKdoNG1pXl-Vk8HwVnFtye4O890YC9iEvZ_vO1NQ1DXlvD-GD5YT8sMY9Kx9GDOvC9yNEYdry5EjilkgQQ==
+      INFLUXDB_HOST: https://us-east-1-1.aws.cloud2.influxdata.com
+      INFLUXDB_ORG: Quix
+      INFLUXDB_MEASUREMENT_NAME: table-data-10s
+      INFLUXDB_DATABASE: StreamingAcademy
       Quix__Broker__Address: kafka-broker:9092
   kafka-broker:
     image: docker.redpanda.com/redpandadata/redpanda:v24.1.1

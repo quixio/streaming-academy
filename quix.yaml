@@ -6,55 +6,89 @@ metadata:
 
 # This section describes the Deployments of the data pipeline
 deployments:
-  - name: raw-replay
-    application: raw-replay
+  - name: downsampling
+    application: downsampling
     version: latest
     deploymentType: Service
     resources:
       cpu: 200
-      memory: 500
-      replicas: 1
-    variables:
-      - name: output
-        inputType: OutputTopic
-        description: Name of the output topic to write into
-        required: true
-        value: raw-data
-  - name: file-sink
-    application: file-sink
-    version: latest
-    deploymentType: Service
-    resources:
-      cpu: 200
-      memory: 500
+      memory: 800
       replicas: 1
     variables:
       - name: input
         inputType: InputTopic
-        description: Name of the input topic to listen to.
         required: false
-        value: raw-data
+        value: table-data
+      - name: output
+        inputType: OutputTopic
+        required: false
+        value: table-data-10s
   - name: data-normalization
     application: data-normalization
     version: latest
     deploymentType: Service
     resources:
       cpu: 200
-      memory: 500
+      memory: 800
       replicas: 1
     variables:
       - name: input
         inputType: InputTopic
-        description: Name of the input topic to listen to.
-        required: true
+        required: false
         value: raw-data
       - name: output
         inputType: OutputTopic
-        description: Name of the output topic to write to.
-        required: true
+        required: false
         value: table-data
+  - name: RAW data replay
+    application: raw-replay
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 800
+      replicas: 1
+    variables:
+      - name: output
+        inputType: OutputTopic
+        required: false
+        value: raw-data
+  - name: influx-db-sink
+    application: influx-db-sink
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 800
+      replicas: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        required: false
+        value: table-data-10s
+      - name: INFLUXDB_TOKEN
+        inputType: Secret
+        required: false
+        value: WvTdLKdoNG1pXl-Vk8HwVnFtye4O890YC9iEvZ_vO1NQ1DXlvD-GD5YT8sMY9Kx9GDOvC9yNEYdry5EjilkgQQ==
+      - name: INFLUXDB_HOST
+        inputType: FreeText
+        required: false
+        value: https://us-east-1-1.aws.cloud2.influxdata.com
+      - name: INFLUXDB_ORG
+        inputType: FreeText
+        required: false
+        value: Quix
+      - name: INFLUXDB_MEASUREMENT_NAME
+        inputType: FreeText
+        required: false
+        value: table-data-10s
+      - name: INFLUXDB_DATABASE
+        inputType: FreeText
+        required: false
+        value: StreamingAcademy
 
 # This section describes the Topics of the data pipeline
 topics:
-  - name: raw-data
   - name: table-data
+  - name: table-data-10s
+  - name: raw-data

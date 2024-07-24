@@ -1001,3 +1001,70 @@ sdf = sdf.apply(lambda row: {
     "time": row["end"]
 })
 ```
+
+# Episode 3
+
+In this episode we are going to downsample provided data and sink them to InfluxDb measurement in InfluxCloud. As we don't need granularity of the data for historical analysis (but we need it for realtime alerting) we will downsample data, filter it and strip it before we sink it to InfluxDb.
+
+Let's start with creating new service. We still want Data Normalization serice to produce high resolution data for future alerting purposes. For that reason we will create Downsampling service consuming from `table-data` topic.
+
+```python
+import os
+from quixstreams import Application
+from console_sink import ConsoleSink
+from datetime import timedelta, datetime
+
+# for local dev, load env vars from a .env file
+from dotenv import load_dotenv
+load_dotenv()
+
+app = Application(consumer_group="downsampling-v1.1", auto_offset_reset="latest")
+
+input_topic = app.topic(os.environ["input"])
+output_topic = app.topic(os.environ["output"])
+console_sink = ConsoleSink(metadata=True, max_columns=10, table_width=100)
+
+
+sdf = app.dataframe(input_topic)
+
+sdf = sdf[sdf.contains("accelerometer-x")]
+sdf["accelerometer-total"] = sdf["accelerometer-x"].abs() + sdf["accelerometer-y"].abs() + sdf["accelerometer-z"].abs() 
+
+def window_reduce(window: dict, row:dict):
+    window["accelerometer-sum"] = row["accelerometer-total"]
+    window["accelerometer-max"] = max(window["accelerometer-max"], row["accelerometer-total"])
+    window["accelerometer-count"] += 1
+
+    window["latitude"] = row["location-latitude"]
+    window["longitude"] = row["location-longitude"]
+
+    return window
+
+def window_init(row: dict):
+    return {
+        "accelerometer-sum": row["accelerometer-total"],
+        "accelerometer-max": row["accelerometer-total"],
+        "accelerometer-count": 1,
+        "latitude": row["location-latitude"],
+        "longitude": row["location-longitude"]
+    }
+
+sdf = sdf.tumbling_window(timedelta(seconds=10), timedelta(seconds=1)) \
+    .reduce(window_reduce, window_init) \
+    .final()
+
+sdf = sdf.apply(lambda row: {
+    "g-mean": row["value"]["accelerometer-sum"] / row["value"]["accelerometer-count"],
+    "g-max": row["value"]["accelerometer-max"],
+    "lat": row["value"]["latitude"],
+    "lon": row["value"]["longitude"]
+})
+
+sdf = sdf.sink(console_sink)
+
+sdf.to_topic(output_topic)
+
+if __name__ == "__main__":
+    app.run(sdf)
+```
+

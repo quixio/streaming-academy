@@ -1,9 +1,13 @@
-name: RAW data replay
+name: downsampling
 language: Python
 variables:
+  - name: input
+    inputType: InputTopic
+    defaultValue: table-data
+    required: false
   - name: output
     inputType: OutputTopic
-    defaultValue: raw-data
+    defaultValue: table-data-10s
     required: false
 dockerfile: dockerfile
 runEntryPoint: main.py

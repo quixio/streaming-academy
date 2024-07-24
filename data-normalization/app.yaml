@@ -3,14 +3,12 @@ language: Python
 variables:
   - name: input
     inputType: InputTopic
-    description: Name of the input topic to listen to.
     defaultValue: raw-data
-    required: true
+    required: false
   - name: output
     inputType: OutputTopic
-    description: Name of the output topic to write to.
     defaultValue: table-data
-    required: true
+    required: false
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

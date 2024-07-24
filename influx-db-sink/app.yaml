@@ -1,0 +1,30 @@
+name: influx-db-sink
+language: Python
+variables:
+  - name: input
+    inputType: InputTopic
+    defaultValue: table-data-10s
+    required: false
+  - name: INFLUXDB_TOKEN
+    inputType: Secret
+    defaultValue: WvTdLKdoNG1pXl-Vk8HwVnFtye4O890YC9iEvZ_vO1NQ1DXlvD-GD5YT8sMY9Kx9GDOvC9yNEYdry5EjilkgQQ==
+    required: false
+  - name: INFLUXDB_HOST
+    inputType: FreeText
+    defaultValue: https://us-east-1-1.aws.cloud2.influxdata.com
+    required: false
+  - name: INFLUXDB_ORG
+    inputType: FreeText
+    defaultValue: Quix
+    required: false
+  - name: INFLUXDB_MEASUREMENT_NAME
+    inputType: FreeText
+    defaultValue: table-data-10s
+    required: false
+  - name: INFLUXDB_DATABASE
+    inputType: FreeText
+    defaultValue: StreamingAcademy
+    required: false
+dockerfile: dockerfile
+runEntryPoint: main.py
+defaultFile: main.py
